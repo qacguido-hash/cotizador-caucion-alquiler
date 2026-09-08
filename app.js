@@ -444,8 +444,17 @@ function enviar(){
   }
 
   fetch('/', { method:'POST', body: fd })
-    .then(function(resp){ if (resp.ok) mostrarExito(); else mostrarFallo(); })
-    .catch(mostrarFallo);
+    .then(function(resp){
+      if (resp.ok) { mostrarExito(); return; }
+      resp.text().then(function(txt){
+        console.error('Netlify Forms rechazó el envío. Status:', resp.status, '\nRespuesta:', txt);
+      });
+      mostrarFallo();
+    })
+    .catch(function(err){
+      console.error('Error de red al enviar el formulario:', err);
+      mostrarFallo();
+    });
 }
 G('btn-send').addEventListener('click', enviar);
 
