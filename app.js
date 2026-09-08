@@ -58,9 +58,9 @@ function setM(campo, m){
 
 /* ── porcentajes según duración (misma fórmula que el sitio original) ── */
 function getPct(meses){
-  if (meses===24) return { cuotas:.054, contado:.049 };
-  if (meses===36) return { cuotas:.051, contado:.048 };
-  return { cuotas:.060, contado:.051 };
+  if (meses===24) return { cuotas:.0567, contado:.05145 };
+  if (meses===36) return { cuotas:.05355, contado:.0504 };
+  return { cuotas:.063, contado:.05355 };
 }
 
 function calcData(){

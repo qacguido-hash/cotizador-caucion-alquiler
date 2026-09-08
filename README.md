@@ -40,10 +40,12 @@ Si en algún momento quieren que los documentos lleguen como adjunto real dentro
 ## Fórmula de cotización (para referencia futura)
 
 - **Suma asegurada** = (alquiler mensual + expensas + servicios) × duración en meses, por separado en cada moneda si hay montos en pesos y en dólares.
-- **Costo según duración:**
-  - 12 meses → 6,00% en 6 cuotas sin interés / 5,10% al contado
-  - 24 meses → 5,40% en 6 cuotas sin interés / 4,90% al contado
-  - 36 meses → 5,10% en 6 cuotas sin interés / 4,80% al contado
+- **Costo según duración** (tasas actualizadas, +5% relativo sobre las originales):
+  - 12 meses → 6,30% en 6 cuotas sin interés / 5,355% al contado
+  - 24 meses → 5,67% en 6 cuotas sin interés / 5,145% al contado
+  - 36 meses → 5,355% en 6 cuotas sin interés / 5,04% al contado
+
+  (Tasas originales, por si hace falta volver atrás: 12m 6,00%/5,10% · 24m 5,40%/4,90% · 36m 5,10%/4,80%)
 - **Avalista:** se ofrece si el ingreso mensual neto es menor a 2 veces el alquiler mensual.
 
 ## Datos de contacto embebidos en el código
