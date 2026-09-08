@@ -22,6 +22,29 @@ function fM(n,m){ return m==='USD' ? fU(n) : fA(n); }
 /* ── moneda por campo ─────────────────────────────── */
 var MON = { canon:'ARS', exp:'ARS', ser:'ARS', ing:'ARS', aval:'ARS' };
 
+/* ── el cliente elige cuotas o pago único ─────────────────────────── */
+var ELEGIDO = { ARS:null, USD:null };
+function pintarEleccion(mon){
+  var cont = G('cpays-'+mon.toLowerCase());
+  var elegido = ELEGIDO[mon];
+  cont.classList.toggle('has-choice', !!elegido);
+  cont.querySelectorAll('.cpay').forEach(function(b){ b.classList.toggle('selected', b.dataset.tipo===elegido); });
+  var etiqueta = G('elegido-'+mon.toLowerCase());
+  if (elegido){
+    etiqueta.classList.add('show');
+    etiqueta.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> Elegiste: '+(elegido==='cuotas'?'6 cuotas sin interés':'pago único');
+  } else {
+    etiqueta.classList.remove('show');
+  }
+}
+document.querySelectorAll('.cpay[data-mon]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var mon = btn.dataset.mon, tipo = btn.dataset.tipo;
+    ELEGIDO[mon] = (ELEGIDO[mon]===tipo) ? null : tipo;
+    pintarEleccion(mon);
+  });
+});
+
 document.querySelectorAll('.mb[data-campo]').forEach(function(btn){
   btn.addEventListener('click', function(){ setM(btn.dataset.campo, btn.dataset.mon); });
 });
@@ -273,8 +296,8 @@ function buildResumen(){
   var html='<strong>Solicitante:</strong> '+(nom||'—')+'<br>'
     +'<strong>Inmueble:</strong> '+(V('tipo')||'—')+' · '+(V('dir')||'—')+'<br>'
     +'<strong>Duración:</strong> '+(d.meses||'—')+' meses<br>';
-  if (d.hayARS) html+='<strong>Suma ARS:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fA(d.sumaARS)+'</span> → Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/c) | Contado: '+fA(d.contARS)+'<br>';
-  if (d.hayUSD) html+='<strong>Suma USD:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fU(d.sumaUSD)+'</span> → Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/c) | Contado: '+fU(d.contUSD)+'<br>';
+  if (d.hayARS) html+='<strong>Suma ARS:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fA(d.sumaARS)+'</span> → Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/c) | Contado: '+fA(d.contARS)+(ELEGIDO.ARS?' · <strong>Elegido: '+(ELEGIDO.ARS==='cuotas'?'6 cuotas':'pago único')+'</strong>':'')+'<br>';
+  if (d.hayUSD) html+='<strong>Suma USD:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fU(d.sumaUSD)+'</span> → Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/c) | Contado: '+fU(d.contUSD)+(ELEGIDO.USD?' · <strong>Elegido: '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único')+'</strong>':'')+'<br>';
   var nd=totalDocs();
   html += '<strong>Documentos adjuntos:</strong> '+(nd>0 ? nd+' archivo'+(nd===1?'':'s') : 'ninguno todavía');
   G('rdata').innerHTML=html;
@@ -282,8 +305,8 @@ function buildResumen(){
   var waTxt = 'Hola Guido! Te paso mi cotización de caución:%0A'
     +'Inmueble: '+encodeURIComponent(V('tipo')||'—')+' - '+encodeURIComponent(V('dir')||'—')+'%0A'
     +'Duración: '+d.meses+' meses%0A';
-  if (d.hayARS) waTxt += 'Suma ARS: '+encodeURIComponent(fA(d.sumaARS))+' (Cuota: '+encodeURIComponent(fA(d.cuotaARS))+' x6 / Contado: '+encodeURIComponent(fA(d.contARS))+')%0A';
-  if (d.hayUSD) waTxt += 'Suma USD: '+encodeURIComponent(fU(d.sumaUSD))+' (Cuota: '+encodeURIComponent(fU(d.cuotaUSD))+' x6 / Contado: '+encodeURIComponent(fU(d.contUSD))+')%0A';
+  if (d.hayARS) waTxt += 'Suma ARS: '+encodeURIComponent(fA(d.sumaARS))+' (Cuota: '+encodeURIComponent(fA(d.cuotaARS))+' x6 / Contado: '+encodeURIComponent(fA(d.contARS))+')'+(ELEGIDO.ARS?encodeURIComponent(' - Elijo '+(ELEGIDO.ARS==='cuotas'?'6 cuotas':'pago único')):'')+'%0A';
+  if (d.hayUSD) waTxt += 'Suma USD: '+encodeURIComponent(fU(d.sumaUSD))+' (Cuota: '+encodeURIComponent(fU(d.cuotaUSD))+' x6 / Contado: '+encodeURIComponent(fU(d.contUSD))+')'+(ELEGIDO.USD?encodeURIComponent(' - Elijo '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único')):'')+'%0A';
   waTxt += 'Nombre: '+encodeURIComponent(nom||'—');
   G('btn-wa-send').href = 'https://wa.me/5491121600427?text='+waTxt;
 }
@@ -410,8 +433,8 @@ function resumenTexto(d){
     'Inmueble: '+d.tipo+' — '+d.dir,
     'Duración: '+d.meses+' meses'
   ];
-  if (d.sumaARS>0) lineas.push('Suma asegurada ARS: '+fA(d.sumaARS)+' · Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/mes x6) · Contado: '+fA(d.contARS));
-  if (d.sumaUSD>0) lineas.push('Suma asegurada USD: '+fU(d.sumaUSD)+' · Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/mes x6) · Contado: '+fU(d.contUSD));
+  if (d.sumaARS>0) lineas.push('Suma asegurada ARS: '+fA(d.sumaARS)+' · Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/mes x6) · Contado: '+fA(d.contARS)+(ELEGIDO.ARS?' · ELIGIÓ: '+(ELEGIDO.ARS==='cuotas'?'6 cuotas':'pago único'):''));
+  if (d.sumaUSD>0) lineas.push('Suma asegurada USD: '+fU(d.sumaUSD)+' · Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/mes x6) · Contado: '+fU(d.contUSD)+(ELEGIDO.USD?' · ELIGIÓ: '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único'):''));
   lineas.push('Ingreso mensual: '+fM(d.ingreso,d.mI));
   if (d.avNom!=='—') lineas.push('Avalista: '+d.avNom+' (DNI '+d.avDni+') · Ingreso: '+fM(d.avIng,d.mAval));
   if (d.obs!=='—') lineas.push('Observaciones: '+d.obs);
@@ -513,6 +536,8 @@ function resetForm(){
   document.querySelectorAll('.errmsg').forEach(function(e){ e.classList.remove('show'); });
   DOCS.contrato=[]; DOCS.recibos=[]; DOCS.aval=[];
   ['contrato','recibos','aval'].forEach(renderDocs);
+  ELEGIDO.ARS=null; ELEGIDO.USD=null;
+  pintarEleccion('ARS'); pintarEleccion('USD');
   G('grp-aval').classList.remove('show');
   ['canon','exp','ser','ing','aval'].forEach(function(c){
     MON[c]='ARS';

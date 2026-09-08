@@ -278,19 +278,23 @@
           <div id="bloque-ars" style="display:none">
             <div class="crow"><span class="lbl" style="font-weight:700;color:var(--wine)">Suma aseg. (ARS)</span><span class="val g" id="v-suma-ars" style="font-size:14px">—</span></div>
             <div class="bloque-titulo">Costo en pesos</div>
-            <div class="cpays">
-              <div class="cpay c1"><div class="pl">6 cuotas s/i</div><div class="pv" id="v-cuota-ars">—</div><div class="ps" id="v-tot-ars">por cuota</div></div>
-              <div class="cpay c2"><div class="pl">Pago único</div><div class="pv" id="v-cont-ars">—</div><div class="ps">un solo pago</div></div>
+            <div class="pick-hint">Tocá la opción que te conviene</div>
+            <div class="cpays" id="cpays-ars">
+              <button type="button" class="cpay c1" data-mon="ARS" data-tipo="cuotas"><span class="cpay-check"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span><div class="pl">6 cuotas s/i</div><div class="pv" id="v-cuota-ars">—</div><div class="ps" id="v-tot-ars">por cuota</div></button>
+              <button type="button" class="cpay c2" data-mon="ARS" data-tipo="contado"><span class="cpay-check"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span><div class="pl">Pago único</div><div class="pv" id="v-cont-ars">—</div><div class="ps">un solo pago</div></button>
             </div>
+            <div class="cpay-elegido" id="elegido-ars"></div>
             <div class="ahorro" id="ah-ars"></div>
           </div>
           <div id="bloque-usd" style="display:none">
             <div class="crow" style="margin-top:10px"><span class="lbl" style="font-weight:700;color:var(--yellow-deep)">Suma aseg. (USD)</span><span class="val g" id="v-suma-usd" style="font-size:14px">—</span></div>
             <div class="bloque-titulo">Costo en dólares</div>
-            <div class="cpays">
-              <div class="cpay c1"><div class="pl">6 cuotas s/i</div><div class="pv" id="v-cuota-usd">—</div><div class="ps" id="v-tot-usd">por cuota</div></div>
-              <div class="cpay c2"><div class="pl">Pago único</div><div class="pv" id="v-cont-usd">—</div><div class="ps">un solo pago</div></div>
+            <div class="pick-hint">Tocá la opción que te conviene</div>
+            <div class="cpays" id="cpays-usd">
+              <button type="button" class="cpay c1" data-mon="USD" data-tipo="cuotas"><span class="cpay-check"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span><div class="pl">6 cuotas s/i</div><div class="pv" id="v-cuota-usd">—</div><div class="ps" id="v-tot-usd">por cuota</div></button>
+              <button type="button" class="cpay c2" data-mon="USD" data-tipo="contado"><span class="cpay-check"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span><div class="pl">Pago único</div><div class="pv" id="v-cont-usd">—</div><div class="ps">un solo pago</div></button>
             </div>
+            <div class="cpay-elegido" id="elegido-usd"></div>
             <div class="ahorro" id="ah-usd"></div>
           </div>
         </div>
