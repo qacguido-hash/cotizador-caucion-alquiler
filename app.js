@@ -293,7 +293,18 @@ function hacerPDF(d){
   var jsPDFlib = window.jspdf.jsPDF;
   var doc = new jsPDFlib({format:'a4'});
   var NV=[52,80,107], NVD=[36,58,78], GD=[169,135,28], WH=[255,255,255], LG=[246,247,249], GR=[69,75,82];
-  var W=210, M=16, y=0;
+  var W=210, H=297, M=16, y=0;
+
+  function checkPage(need){
+    if (y + need > H - 48){
+      doc.addPage();
+      doc.setFillColor.apply(doc,NVD); doc.rect(0,0,W,15,'F');
+      doc.setFillColor.apply(doc,GD); doc.rect(0,14.5,W,1.2,'F');
+      doc.setTextColor.apply(doc,WH); doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+      doc.text('COTIZACIÓN CAUCIÓN DE ALQUILER — Guido Bonifati',M,9.5);
+      y = 26;
+    }
+  }
 
   doc.setFillColor.apply(doc,NVD); doc.rect(0,0,W,48,'F');
   doc.setFillColor.apply(doc,GD); doc.rect(0,45,W,3,'F');
@@ -327,14 +338,17 @@ function hacerPDF(d){
     y+=38;
   }
 
+  checkPage(15+60);
   sec('Datos del Solicitante');
   row('Nombre y Apellido',d.nombre+' '+d.apellido,false); row('DNI',d.dni,true);
   row('Email',d.email,false); row('Teléfono',d.tel,true);
   row('Estado civil',d.ecivil,false); row('Situación laboral',d.sitlab,true); y+=4;
 
+  checkPage(15+30);
   sec('Datos del Inmueble');
   row('Tipo',d.tipo,false); row('Dirección',d.dir,true); row('Duración',d.meses+' meses',false); y+=4;
 
+  checkPage(15+40);
   sec('Cálculo de la Suma Asegurada',GD);
   row('Canon mensual',fM(d.canonV,d.mC),false);
   row('Expensas',d.expV>0?fM(d.expV,d.mE):'—',true);
@@ -342,6 +356,7 @@ function hacerPDF(d){
   row('Duración contrato',d.meses+' meses',true); y+=4;
 
   if (d.sumaARS > 0) {
+    checkPage(17+38);
     doc.setFillColor(224,232,240); doc.setDrawColor.apply(doc,NV); doc.rect(M,y,W-M*2,11,'FD');
     doc.setTextColor.apply(doc,NV); doc.setFont('helvetica','bold'); doc.setFontSize(10);
     doc.text('SUMA ASEGURADA EN PESOS',M+4,y+8);
@@ -352,6 +367,7 @@ function hacerPDF(d){
 
   if (d.sumaUSD > 0) {
     y+=4;
+    checkPage(17+38);
     doc.setFillColor(250,242,220); doc.setDrawColor.apply(doc,GD); doc.rect(M,y,W-M*2,11,'FD');
     doc.setTextColor.apply(doc,NV); doc.setFont('helvetica','bold'); doc.setFontSize(10);
     doc.text('SUMA ASEGURADA EN DÓLARES',M+4,y+8);
@@ -361,12 +377,15 @@ function hacerPDF(d){
   }
 
   if (d.obs && d.obs!=='—') {
-    y+=4; sec('Observaciones');
+    y+=4;
+    var lnObs=doc.splitTextToSize(d.obs,W-M*2-8);
+    checkPage(15+lnObs.length*6+8);
+    sec('Observaciones');
     doc.setTextColor.apply(doc,GR); doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
-    var ln=doc.splitTextToSize(d.obs,W-M*2-8); doc.text(ln,M+4,y); y+=ln.length*6+8;
+    doc.text(lnObs,M+4,y); y+=lnObs.length*6+8;
   }
 
-  y=Math.max(y,240);
+  checkPage(26);
   doc.setFillColor.apply(doc,LG); doc.rect(M,y,W-M*2,18,'F');
   doc.setTextColor.apply(doc,GR); doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
   doc.text(doc.splitTextToSize('Esta cotización es informativa y sujeta a análisis crediticio. La emisión queda condicionada a la aprobación del estudio de riesgo. Respuesta en 24 horas hábiles.',W-M*2-8),M+4,y+6);
