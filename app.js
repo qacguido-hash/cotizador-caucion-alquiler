@@ -60,7 +60,7 @@ function enviarEmailJS(data){
 }
 
 function fA(n){ return n>0 ? '$'+Math.round(n).toLocaleString('es-AR') : '—'; }
-function fU(n){ return n>0 ? 'U$S '+Math.round(n).toLocaleString('es-AR') : '—'; }
+function fU(n){ return n>0 ? 'USD '+Math.round(n).toLocaleString('es-AR') : '—'; }
 function fM(n,m){ return m==='USD' ? fU(n) : fA(n); }
 
 /* ── moneda por campo ─────────────────────────────── */
@@ -225,7 +225,7 @@ function chkAval(){
     box.classList.remove('show');
     docAval.classList.remove('show');
   } else {
-    var sym = MON.ing==='USD' ? 'U$S ' : '$';
+    var sym = MON.ing==='USD' ? 'USD ' : '$';
     st.innerHTML='<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="color:var(--yellow-deep)"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg><span>Te faltan <strong>'+sym+Math.round(req-ingreso).toLocaleString('es-AR')+'/mes</strong>. Podés incluir un avalista.</span>';
     st.style.background='var(--yellow-pale)'; st.style.borderLeftColor='var(--yellow)';
     box.classList.add('show');
