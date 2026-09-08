@@ -143,14 +143,7 @@ function animar(el, to, fmt){
 function ahorroHTML(costoCuotas, costoContado){
   if (costoCuotas<=0) return '';
   var pct = Math.round(((costoCuotas-costoContado)/costoCuotas)*100);
-  var maxV = Math.max(costoCuotas, costoContado)||1;
-  var wCu = Math.max(6, (costoCuotas/maxV)*100);
-  var wCo = Math.max(6, (costoContado/maxV)*100);
-  return '<div class="ah-bars">'+
-    '<div class="ah-row"><span class="ah-lbl">Cuotas</span><div class="ah-track"><div class="ah-fill cu" style="width:'+wCu+'%"></div></div></div>'+
-    '<div class="ah-row"><span class="ah-lbl">Contado</span><div class="ah-track"><div class="ah-fill co" style="width:'+wCo+'%"></div></div></div>'+
-    '</div>'+
-    '<div class="ah-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 7h6v6"/></svg>Ahorrás '+pct+'% pagando de contado</div>';
+  return '<div class="ah-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17l-8.5-8.5-5 5L2 7"/><path d="M16 7h6v6"/></svg>Ahorrás '+pct+'% pagando de contado</div>';
 }
 
 function recalc(){

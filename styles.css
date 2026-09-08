@@ -183,13 +183,6 @@ input.invalid{border-color:var(--red);background:var(--red-pale);}
 .cpay-elegido .icon{width:12px;height:12px;flex-shrink:0;}
 
 .ahorro{margin-top:11px;}
-.ah-bars{display:flex;flex-direction:column;gap:6px;}
-.ah-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted);}
-.ah-row .ah-lbl{width:44px;flex-shrink:0;font-weight:600;text-transform:uppercase;letter-spacing:.2px;}
-.ah-track{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden;}
-.ah-fill{height:100%;border-radius:4px;transition:width var(--dur-med) ease;}
-.ah-fill.cu{background:var(--mauve);}
-.ah-fill.co{background:var(--yellow);}
 .ah-badge{margin-top:9px;background:var(--green-pale);color:var(--green);border-radius:6px;padding:8px 10px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;}
 .ah-badge .icon{width:13px;height:13px;flex-shrink:0;}
 
