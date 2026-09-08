@@ -336,6 +336,28 @@ function go(step){
   saveDraft();
 }
 
+/* ── construir el objeto de datos completo (se usa para enviar, el PDF, WhatsApp, etc.) ── */
+function construirDatos(){
+  var d = calcData();
+  return {
+    nombre:V('nombre').trim(), apellido:V('apellido').trim(),
+    dni:V('dni').trim(), email:V('email').trim(), tel:V('tel').trim(),
+    ecivil:V('ecivil')||'—', sitlab:V('sitlab'),
+    tipo:V('tipo'), dir:V('dir').trim(), obs:V('obs').trim()||'—',
+    meses:d.meses,
+    canonV:d.canonV, mC:MON.canon,
+    expV:d.expV, mE:MON.exp,
+    serV:d.serV, mS:MON.ser,
+    sumaARS:d.sumaARS, costoARS:d.costoARS, cuotaARS:d.cuotaARS, contARS:d.contARS,
+    sumaUSD:d.sumaUSD, costoUSD:d.costoUSD, cuotaUSD:d.cuotaUSD, contUSD:d.contUSD,
+    ingreso:N('ingreso'), mI:MON.ing,
+    avNom:V('av-nom').trim()||'—', avDni:V('av-dni').trim()||'—',
+    avIng:N('av-ing'), mAval:MON.aval,
+    fecha:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    hora:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
+  };
+}
+
 /* ── resumen ──────────────────────────────────────── */
 function buildResumen(){
   var d=calcData();
@@ -348,15 +370,29 @@ function buildResumen(){
   var nd=totalDocs();
   html += '<strong>Documentos adjuntos:</strong> '+(nd>0 ? nd+' archivo'+(nd===1?'':'s') : 'ninguno todavía');
   G('rdata').innerHTML=html;
-
-  var waTxt = 'Hola Guido! Te paso mi cotización de caución:%0A'
-    +'Inmueble: '+encodeURIComponent(V('tipo')||'—')+' - '+encodeURIComponent(V('dir')||'—')+'%0A'
-    +'Duración: '+d.meses+' meses%0A';
-  if (d.hayARS) waTxt += 'Suma ARS: '+encodeURIComponent(fA(d.sumaARS))+' (Cuota: '+encodeURIComponent(fA(d.cuotaARS))+' x6 / Contado: '+encodeURIComponent(fA(d.contARS))+')'+(ELEGIDO.ARS?encodeURIComponent(' - Elijo '+(ELEGIDO.ARS==='cuotas'?'6 cuotas':'pago único')):'')+'%0A';
-  if (d.hayUSD) waTxt += 'Suma USD: '+encodeURIComponent(fU(d.sumaUSD))+' (Cuota: '+encodeURIComponent(fU(d.cuotaUSD))+' x6 / Contado: '+encodeURIComponent(fU(d.contUSD))+')'+(ELEGIDO.USD?encodeURIComponent(' - Elijo '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único')):'')+'%0A';
-  waTxt += 'Nombre: '+encodeURIComponent(nom||'—');
-  G('btn-wa-send').href = 'https://wa.me/5491121600427?text='+waTxt;
 }
+
+/* ── compartir por WhatsApp: mismo texto que el mail, con los documentos adjuntos ── */
+function compartirWhatsApp(){
+  var btn = G('btn-wa-send');
+  var data = construirDatos();
+  var texto = 'Hola Guido! Te paso mi cotización de caución:\n\n' + resumenTexto(data);
+  var archivos = DOCS.contrato.concat(DOCS.recibos, DOCS.aval);
+
+  if (navigator.share && navigator.canShare && archivos.length && navigator.canShare({ files: archivos })){
+    navigator.share({ title:'Cotización Caución de Alquiler', text: texto, files: archivos })
+      .catch(function(e){ if (e && e.name !== 'AbortError') toast('No se pudo compartir. Probá de nuevo.', true); });
+    return;
+  }
+  if (navigator.share && !archivos.length){
+    navigator.share({ title:'Cotización Caución de Alquiler', text: texto })
+      .catch(function(e){ if (e && e.name !== 'AbortError') toast('No se pudo compartir. Probá de nuevo.', true); });
+    return;
+  }
+  if (archivos.length) toast('Tu navegador no permite adjuntar los documentos automáticamente — se abre WhatsApp con el texto, adjuntalos ahí a mano.', true);
+  window.open('https://wa.me/5491121600427?text='+encodeURIComponent(texto), '_blank');
+}
+G('btn-wa-send').addEventListener('click', compartirWhatsApp);
 
 /* ── PDF (mismo diseño navy/dorado original, adaptado a la paleta wine/yellow) ── */
 function hacerPDF(d){
@@ -502,24 +538,7 @@ function enviar(){
     toast('Los documentos adjuntos pesan demasiado en total (máximo '+MAX_MB_TOTAL+' MB). Sacá alguno o comprimilos antes de enviar.', true);
     return;
   }
-  var d = calcData();
-  var data = {
-    nombre:V('nombre').trim(), apellido:V('apellido').trim(),
-    dni:V('dni').trim(), email:V('email').trim(), tel:V('tel').trim(),
-    ecivil:V('ecivil')||'—', sitlab:V('sitlab'),
-    tipo:V('tipo'), dir:V('dir').trim(), obs:V('obs').trim()||'—',
-    meses:d.meses,
-    canonV:d.canonV, mC:MON.canon,
-    expV:d.expV, mE:MON.exp,
-    serV:d.serV, mS:MON.ser,
-    sumaARS:d.sumaARS, costoARS:d.costoARS, cuotaARS:d.cuotaARS, contARS:d.contARS,
-    sumaUSD:d.sumaUSD, costoUSD:d.costoUSD, cuotaUSD:d.cuotaUSD, contUSD:d.contUSD,
-    ingreso:N('ingreso'), mI:MON.ing,
-    avNom:V('av-nom').trim()||'—', avDni:V('av-dni').trim()||'—',
-    avIng:N('av-ing'), mAval:MON.aval,
-    fecha:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),
-    hora:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
-  };
+  var data = construirDatos();
 
   var btn=G('btn-send');
   btn.disabled=true;
