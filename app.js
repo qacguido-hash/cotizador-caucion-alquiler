@@ -359,15 +359,20 @@ function buildResumen(){
 function hacerPDF(d){
   var jsPDFlib = window.jspdf.jsPDF;
   var doc = new jsPDFlib({format:'a4'});
+  doc.addFileToVFS('Saira-Regular.ttf', PDF_SAIRA_REGULAR_B64);
+  doc.addFont('Saira-Regular.ttf', 'Saira', 'normal');
+  doc.addFileToVFS('Saira-Bold.ttf', PDF_SAIRA_BOLD_B64);
+  doc.addFont('Saira-Bold.ttf', 'Saira', 'bold');
+  var F = 'Saira';
   var NV=[52,80,107], NVD=[36,58,78], GD=[169,135,28], WH=[255,255,255], LG=[246,247,249], GR=[69,75,82];
-  var W=210, H=297, M=16, y=0;
+  var W=210, H=297, M=16, y=0, RAD=2.2;
 
   function checkPage(need){
     if (y + need > H - 48){
       doc.addPage();
       doc.setFillColor.apply(doc,NVD); doc.rect(0,0,W,15,'F');
       doc.setFillColor.apply(doc,GD); doc.rect(0,14.5,W,1.2,'F');
-      doc.setTextColor.apply(doc,WH); doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+      doc.setTextColor.apply(doc,WH); doc.setFont(F,'bold'); doc.setFontSize(9.5);
       doc.text('COTIZACIÓN CAUCIÓN DE ALQUILER — Guido Bonifati',M,9.5);
       y = 26;
     }
@@ -375,32 +380,35 @@ function hacerPDF(d){
 
   doc.setFillColor.apply(doc,NVD); doc.rect(0,0,W,48,'F');
   doc.setFillColor.apply(doc,GD); doc.rect(0,45,W,3,'F');
-  doc.setFillColor.apply(doc,NV); doc.circle(26,24,14,'F');
-  doc.setTextColor.apply(doc,WH); doc.setFont('helvetica','bold'); doc.setFontSize(15);
-  doc.text('GB',26,29,{align:'center'});
-  doc.setTextColor.apply(doc,WH); doc.setFontSize(17); doc.setFont('helvetica','bold');
+
+  var logoW=32, logoH=logoW*391/874, badgeW=logoW+6, badgeH=logoH+6;
+  var badgeX=8, badgeY=24-badgeH/2;
+  doc.setFillColor.apply(doc,WH); doc.roundedRect(badgeX,badgeY,badgeW,badgeH,RAD,RAD,'F');
+  doc.addImage(PDF_LOGO_GB_B64,'PNG', badgeX+3, badgeY+3, logoW, logoH);
+
+  doc.setTextColor.apply(doc,WH); doc.setFontSize(17); doc.setFont(F,'bold');
   doc.text('COTIZACIÓN CAUCIÓN DE ALQUILER',48,19);
-  doc.setFontSize(9.5); doc.setFont('helvetica','normal'); doc.setTextColor(200,210,220);
+  doc.setFontSize(9.5); doc.setFont(F,'normal'); doc.setTextColor(200,210,220);
   doc.text('Guido Bonifati · Asesor de Seguros · guidobonifatiseguros@gmail.com',48,29);
   doc.text('Fecha: '+d.fecha+' · '+d.hora,48,37); y=58;
 
-  function sec(t,c){ c=c||NV; doc.setFillColor.apply(doc,c); doc.rect(M,y,W-M*2,10,'F'); doc.setTextColor.apply(doc,WH); doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text(t.toUpperCase(),M+5,y+7); y+=15; }
-  function row(l,v,alt){ if(alt){doc.setFillColor.apply(doc,LG);doc.rect(M,y-1,W-M*2,9,'F');} doc.setTextColor.apply(doc,GR); doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.text(l,M+4,y+5); doc.setTextColor.apply(doc,NV); doc.setFont('helvetica','bold'); doc.text(String(v),W-M-4,y+5,{align:'right'}); y+=10; }
+  function sec(t,c){ c=c||NV; doc.setFillColor.apply(doc,c); doc.roundedRect(M,y,W-M*2,10,RAD,RAD,'F'); doc.setTextColor.apply(doc,WH); doc.setFont(F,'bold'); doc.setFontSize(10); doc.text(t.toUpperCase(),M+5,y+7); y+=15; }
+  function row(l,v,alt){ if(alt){doc.setFillColor.apply(doc,LG);doc.rect(M,y-1,W-M*2,9,'F');} doc.setTextColor.apply(doc,GR); doc.setFont(F,'normal'); doc.setFontSize(9.5); doc.text(l,M+4,y+5); doc.setTextColor.apply(doc,NV); doc.setFont(F,'bold'); doc.text(String(v),W-M-4,y+5,{align:'right'}); y+=10; }
   function cajas(cuota, totalCuotas, contado){
     var hw=(W-M*2-8)/2;
-    doc.setFillColor.apply(doc,NVD); doc.rect(M,y,hw,30,'F');
-    doc.setFillColor.apply(doc,GD); doc.rect(M+hw+8,y,hw,30,'F');
-    doc.setTextColor(200,210,225); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.setFillColor.apply(doc,NVD); doc.roundedRect(M,y,hw,30,RAD,RAD,'F');
+    doc.setFillColor.apply(doc,GD); doc.roundedRect(M+hw+8,y,hw,30,RAD,RAD,'F');
+    doc.setTextColor(200,210,225); doc.setFont(F,'normal'); doc.setFontSize(7.5);
     doc.text('6 CUOTAS SIN INTERÉS',M+hw/2,y+8,{align:'center'});
-    doc.setTextColor(230,195,90); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.setTextColor(230,195,90); doc.setFont(F,'bold'); doc.setFontSize(13);
     doc.text(cuota,M+hw/2,y+18,{align:'center'});
-    doc.setTextColor(200,210,225); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.setTextColor(200,210,225); doc.setFont(F,'normal'); doc.setFontSize(7);
     doc.text('× 6 = '+totalCuotas,M+hw/2,y+26,{align:'center'});
-    doc.setTextColor.apply(doc,WH); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.setTextColor.apply(doc,WH); doc.setFont(F,'normal'); doc.setFontSize(7.5);
     doc.text('PAGO ÚNICO',M+hw+8+hw/2,y+8,{align:'center'});
-    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.setFont(F,'bold'); doc.setFontSize(13);
     doc.text(contado,M+hw+8+hw/2,y+18,{align:'center'});
-    doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.setFont(F,'normal'); doc.setFontSize(7);
     doc.text('un solo pago',M+hw+8+hw/2,y+26,{align:'center'});
     y+=38;
   }
@@ -424,8 +432,8 @@ function hacerPDF(d){
 
   if (d.sumaARS > 0) {
     checkPage(17+38);
-    doc.setFillColor(224,232,240); doc.setDrawColor.apply(doc,NV); doc.rect(M,y,W-M*2,11,'FD');
-    doc.setTextColor.apply(doc,NV); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.setFillColor(224,232,240); doc.setDrawColor.apply(doc,NV); doc.roundedRect(M,y,W-M*2,11,RAD,RAD,'FD');
+    doc.setTextColor.apply(doc,NV); doc.setFont(F,'bold'); doc.setFontSize(10);
     doc.text('SUMA ASEGURADA EN PESOS',M+4,y+8);
     doc.setTextColor.apply(doc,GD); doc.setFontSize(13); doc.text(fA(d.sumaARS),W-M-4,y+8,{align:'right'});
     y+=17;
@@ -435,8 +443,8 @@ function hacerPDF(d){
   if (d.sumaUSD > 0) {
     y+=4;
     checkPage(17+38);
-    doc.setFillColor(250,242,220); doc.setDrawColor.apply(doc,GD); doc.rect(M,y,W-M*2,11,'FD');
-    doc.setTextColor.apply(doc,NV); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.setFillColor(250,242,220); doc.setDrawColor.apply(doc,GD); doc.roundedRect(M,y,W-M*2,11,RAD,RAD,'FD');
+    doc.setTextColor.apply(doc,NV); doc.setFont(F,'bold'); doc.setFontSize(10);
     doc.text('SUMA ASEGURADA EN DÓLARES',M+4,y+8);
     doc.setTextColor.apply(doc,GD); doc.setFontSize(13); doc.text(fU(d.sumaUSD),W-M-4,y+8,{align:'right'});
     y+=17;
@@ -448,20 +456,20 @@ function hacerPDF(d){
     var lnObs=doc.splitTextToSize(d.obs,W-M*2-8);
     checkPage(15+lnObs.length*6+8);
     sec('Observaciones');
-    doc.setTextColor.apply(doc,GR); doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+    doc.setTextColor.apply(doc,GR); doc.setFont(F,'normal'); doc.setFontSize(9.5);
     doc.text(lnObs,M+4,y); y+=lnObs.length*6+8;
   }
 
   checkPage(26);
-  doc.setFillColor.apply(doc,LG); doc.rect(M,y,W-M*2,18,'F');
-  doc.setTextColor.apply(doc,GR); doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
+  doc.setFillColor.apply(doc,LG); doc.roundedRect(M,y,W-M*2,18,RAD,RAD,'F');
+  doc.setTextColor.apply(doc,GR); doc.setFont(F,'normal'); doc.setFontSize(7.5);
   doc.text(doc.splitTextToSize('Esta cotización es informativa y sujeta a análisis crediticio. La emisión queda condicionada a la aprobación del estudio de riesgo. Respuesta en 24 horas hábiles.',W-M*2-8),M+4,y+6);
 
   doc.setFillColor.apply(doc,NVD); doc.rect(0,271,W,26,'F');
   doc.setFillColor.apply(doc,GD); doc.rect(0,268,W,3,'F');
-  doc.setTextColor.apply(doc,WH); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.setTextColor.apply(doc,WH); doc.setFont(F,'bold'); doc.setFontSize(9);
   doc.text('Guido Bonifati · Asesor de Seguros',W/2,279,{align:'center'});
-  doc.setFont('helvetica','normal'); doc.setTextColor.apply(doc,GD); doc.setFontSize(8.5);
+  doc.setFont(F,'normal'); doc.setTextColor.apply(doc,GD); doc.setFontSize(8.5);
   doc.text('guidobonifatiseguros@gmail.com · 11 2160-0427',W/2,288,{align:'center'});
 
   var filename = 'Cotizacion_Caucion_'+(d.apellido||'cliente')+'_'+(d.dni||'')+'_'+d.fecha.replace(/\//g,'-')+'.pdf';
