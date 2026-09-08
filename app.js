@@ -177,9 +177,20 @@ function renderDocs(clave){
     return '<span class="upload-chip"><span>'+f.name+'</span><button type="button" data-clave="'+clave+'" data-idx="'+i+'" aria-label="Quitar">'+iconoQuitar()+'</button></span>';
   }).join('');
 }
+var MAX_MB_ARCHIVO = 8;
 function agregarArchivos(clave, fileList){
-  Array.from(fileList||[]).forEach(function(f){ DOCS[clave].push(f); });
+  Array.from(fileList||[]).forEach(function(f){
+    if (f.size > MAX_MB_ARCHIVO*1024*1024){
+      toast('"'+f.name+'" pesa '+(f.size/1024/1024).toFixed(1)+' MB — máximo '+MAX_MB_ARCHIVO+' MB. Comprimilo o sacá una foto más liviana.', true);
+      return;
+    }
+    DOCS[clave].push(f);
+  });
   renderDocs(clave);
+}
+function totalMBAdjuntos(){
+  var total = DOCS.contrato.concat(DOCS.recibos, DOCS.aval).reduce(function(s,f){ return s+f.size; }, 0);
+  return total/1024/1024;
 }
 ['contrato','recibos','aval'].forEach(function(clave){
   var input=G('doc-'+clave), zone=G('uz-'+(clave==='aval'?'aval-doc':clave));
@@ -389,7 +400,12 @@ function resumenTexto(d){
 }
 
 /* ── envío real: Netlify Forms (datos + documentos adjuntos) + PDF local ── */
+var MAX_MB_TOTAL = 15;
 function enviar(){
+  if (totalMBAdjuntos() > MAX_MB_TOTAL){
+    toast('Los documentos adjuntos pesan demasiado en total (máximo '+MAX_MB_TOTAL+' MB). Sacá alguno o comprimilos antes de enviar.', true);
+    return;
+  }
   var d = calcData();
   var data = {
     nombre:V('nombre').trim(), apellido:V('apellido').trim(),
