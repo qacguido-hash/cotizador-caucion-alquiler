@@ -15,6 +15,50 @@ function attachMiles(id){
   });
 }
 ['canon','expensas','servicios','ingreso','av-ing'].forEach(attachMiles);
+/* ── EmailJS: notificación prolija en paralelo a Netlify Forms ──────
+   Netlify Forms sigue siendo el canal confiable (guarda todo, maneja
+   adjuntos). EmailJS solo manda un mail con el mismo formato prolijo
+   de antes; si falla, no afecta lo que ve el cliente ni el registro
+   en Netlify. ── */
+var EJS_PUBLIC_KEY = 'OfWhG-5c7AF35hT3K';
+var EJS_SVC = 'service_t5niy2k';
+var EJS_TPL = 'template_fs65o6o';
+var EJS_DEST = 'guidobonifatiseguros@gmail.com';
+try{ if (typeof emailjs !== 'undefined') emailjs.init(EJS_PUBLIC_KEY); }catch(e){}
+
+function enviarEmailJS(data){
+  if (typeof emailjs === 'undefined') { console.error('EmailJS no cargó (revisar conexión/CDN).'); return; }
+  emailjs.send(EJS_SVC, EJS_TPL, {
+    to_email:EJS_DEST,
+    solicitante:data.nombre+' '+data.apellido,
+    dni:data.dni, email_cliente:data.email, telefono:data.tel,
+    estado_civil:data.ecivil, situacion_laboral:data.sitlab,
+    tipo_inmueble:data.tipo, direccion:data.dir, duracion:data.meses+' meses',
+    canon:fM(data.canonV,data.mC),
+    expensas:data.expV>0?fM(data.expV,data.mE):'—',
+    servicios:data.serV>0?fM(data.serV,data.mS):'—',
+    suma_ars:data.sumaARS>0?fA(data.sumaARS):'—',
+    costo_cuotas_ars:data.costoARS>0?fA(data.costoARS):'—',
+    valor_cuota_ars:data.cuotaARS>0?fA(data.cuotaARS):'—',
+    costo_contado_ars:data.contARS>0?fA(data.contARS):'—',
+    suma_usd:data.sumaUSD>0?fU(data.sumaUSD):'—',
+    costo_cuotas_usd:data.costoUSD>0?fU(data.costoUSD):'—',
+    valor_cuota_usd:data.cuotaUSD>0?fU(data.cuotaUSD):'—',
+    costo_contado_usd:data.contUSD>0?fU(data.contUSD):'—',
+    ingreso:fM(data.ingreso,data.mI),
+    eleccion_ars:ELEGIDO.ARS?(ELEGIDO.ARS==='cuotas'?'6 cuotas':'Pago único'):'—',
+    eleccion_usd:ELEGIDO.USD?(ELEGIDO.USD==='cuotas'?'6 cuotas':'Pago único'):'—',
+    avalista:data.avNom, aval_dni:data.avDni,
+    aval_ingreso:data.avIng>0?fM(data.avIng,data.mAval):'—',
+    documentos_adjuntos:totalDocs()+' archivo'+(totalDocs()===1?'':'s')+' (ver en el panel de Netlify Forms)',
+    observaciones:data.obs, fecha:data.fecha, hora:data.hora
+  }).then(function(){
+    console.log('EmailJS: notificación enviada.');
+  }).catch(function(e){
+    console.error('EmailJS falló (la cotización ya quedó guardada en Netlify Forms igual):', e);
+  });
+}
+
 function fA(n){ return n>0 ? '$'+Math.round(n).toLocaleString('es-AR') : '—'; }
 function fU(n){ return n>0 ? 'U$S '+Math.round(n).toLocaleString('es-AR') : '—'; }
 function fM(n,m){ return m==='USD' ? fU(n) : fA(n); }
@@ -58,9 +102,9 @@ function setM(campo, m){
 
 /* ── porcentajes según duración (misma fórmula que el sitio original) ── */
 function getPct(meses){
-  if (meses===24) return { cuotas:.0567, contado:.05145 };
-  if (meses===36) return { cuotas:.05355, contado:.0504 };
-  return { cuotas:.063, contado:.05355 };
+  if (meses===24) return { cuotas:.054, contado:.049 };
+  if (meses===36) return { cuotas:.051, contado:.048 };
+  return { cuotas:.060, contado:.051 };
 }
 
 function calcData(){
@@ -470,6 +514,8 @@ function enviar(){
   var btn=G('btn-send');
   btn.disabled=true;
   btn.innerHTML='<span class="spinner"></span> Enviando...';
+
+  enviarEmailJS(data);
 
   var pdf = hacerPDF(data);
 
