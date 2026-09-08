@@ -307,6 +307,9 @@ function go(step){
     if (!V('duracion')) return toast('Seleccioná la duración del contrato', true);
     if (!V('tipo')) return toast('Seleccioná el tipo de inmueble', true);
     if (!V('dir').trim()) return toast('Ingresá la dirección del inmueble', true);
+    var dCheck = calcData();
+    if (dCheck.hayARS && !ELEGIDO.ARS) return toast('Elegí cómo preferís pagar en pesos: 6 cuotas o pago único', true);
+    if (dCheck.hayUSD && !ELEGIDO.USD) return toast('Elegí cómo preferís pagar en dólares: 6 cuotas o pago único', true);
   }
   if (step===3){
     if (N('ingreso')<=0) return toast('Ingresá tu ingreso mensual', true);
@@ -374,7 +377,7 @@ function hacerPDF(d){
       doc.addPage();
       doc.setDrawColor.apply(doc,BD); doc.setLineWidth(.4); doc.line(0,15,W,15);
       doc.setTextColor.apply(doc,NV); doc.setFont(F,'bold'); doc.setFontSize(9.5);
-      doc.text('COTIZACIÓN CAUCIÓN DE ALQUILER — Guido Bonifati',M,10);
+      doc.text('COTIZACIÓN CAUCIÓN DE ALQUILER',M,10);
       y = 26;
     }
   }
@@ -386,8 +389,7 @@ function hacerPDF(d){
   doc.setTextColor.apply(doc,NV); doc.setFontSize(16); doc.setFont(F,'bold');
   doc.text('COTIZACIÓN CAUCIÓN DE ALQUILER',txX,18);
   doc.setFontSize(9.5); doc.setFont(F,'normal'); doc.setTextColor.apply(doc,MU);
-  doc.text('Guido Bonifati · Asesor de Seguros',txX,25);
-  doc.text('Fecha: '+d.fecha+' · '+d.hora,txX,31);
+  doc.text('Fecha: '+d.fecha+' · '+d.hora,txX,26);
 
   doc.setFillColor.apply(doc,GD); doc.rect(0,40,W,1.4,'F');
   y=52;
