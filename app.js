@@ -157,8 +157,6 @@ function recalc(){
   var hasData = d.canonV>0 && d.meses>0;
   G('cempty').style.display = hasData ? 'none' : 'block';
   G('cdata').style.display  = hasData ? 'block' : 'none';
-  document.body.classList.toggle('has-mbar', hasData);
-  G('mbar').classList.toggle('show', hasData);
 
   G('bloque-ars').style.display = d.hayARS ? 'block' : 'none';
   if (d.hayARS){
@@ -177,15 +175,6 @@ function recalc(){
     G('ah-usd').innerHTML = ahorroHTML(d.costoUSD, d.contUSD);
   }
 
-  if (hasData){
-    var symEl = d.hayARS ? fA(d.cuotaARS) : fU(d.cuotaUSD);
-    G('mbar-val').textContent = symEl;
-    var detail = '';
-    if (d.hayARS) detail += '<div class="col"><div class="k">Suma ARS</div><div class="v">'+fA(d.sumaARS)+'</div><div class="k" style="margin-top:6px">Contado</div><div class="v">'+fA(d.contARS)+'</div></div>';
-    if (d.hayUSD) detail += '<div class="col"><div class="k">Suma USD</div><div class="v">'+fU(d.sumaUSD)+'</div><div class="k" style="margin-top:6px">Contado</div><div class="v">'+fU(d.contUSD)+'</div></div>';
-    G('mbar-detail-inner').innerHTML = detail;
-  }
-
   chkAval();
 }
 
@@ -193,12 +182,6 @@ function recalc(){
   var el=G(id); if(!el) return;
   el.addEventListener('input', function(){ recalc(); saveDraft(); });
   el.addEventListener('change', function(){ recalc(); saveDraft(); });
-});
-
-/* ── mbar toggle ──────────────────────────────────── */
-G('mbar-toggle').addEventListener('click', function(){
-  var open = G('mbar-detail').classList.toggle('open');
-  this.classList.toggle('open', open);
 });
 
 /* ── avalista (ingreso >= 2x alquiler) ───────────────── */
