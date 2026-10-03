@@ -161,16 +161,16 @@ function recalc(){
   G('bloque-ars').style.display = d.hayARS ? 'block' : 'none';
   if (d.hayARS){
     G('v-suma-ars').textContent = fA(d.sumaARS);
-    animar(G('v-cuota-ars'), d.costoARS, fA);
-    G('v-tot-ars').textContent = '6 cuotas de '+fA(d.cuotaARS);
+    animar(G('v-cuota-ars'), d.cuotaARS, fA);
+    G('v-tot-ars').innerHTML = 'Total: <b>'+fA(d.costoARS)+'</b>';
     animar(G('v-cont-ars'), d.contARS, fA);
     G('ah-ars').innerHTML = ahorroHTML(d.costoARS, d.contARS);
   }
   G('bloque-usd').style.display = d.hayUSD ? 'block' : 'none';
   if (d.hayUSD){
     G('v-suma-usd').textContent = fU(d.sumaUSD);
-    animar(G('v-cuota-usd'), d.costoUSD, fU);
-    G('v-tot-usd').textContent = '6 cuotas de '+fU(d.cuotaUSD);
+    animar(G('v-cuota-usd'), d.cuotaUSD, fU);
+    G('v-tot-usd').innerHTML = 'Total: <b>'+fU(d.costoUSD)+'</b>';
     animar(G('v-cont-usd'), d.contUSD, fU);
     G('ah-usd').innerHTML = ahorroHTML(d.costoUSD, d.contUSD);
   }
