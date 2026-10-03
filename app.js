@@ -51,6 +51,7 @@ function enviarEmailJS(data){
     avalista:data.avNom, aval_dni:data.avDni,
     aval_ingreso:data.avIng>0?fM(data.avIng,data.mAval):'—',
     documentos_adjuntos:totalDocs()+' archivo'+(totalDocs()===1?'':'s')+' (ver en el panel de Netlify Forms)',
+    nosis_req:data.nosisReq ? 'Sí — gratuito' : 'No solicitado',
     observaciones:data.obs, fecha:data.fecha, hora:data.hora
   }).then(function(){
     console.log('EmailJS: notificación enviada.');
@@ -329,6 +330,7 @@ function construirDatos(){
     ingreso:N('ingreso'), mI:MON.ing,
     avNom:V('av-nom').trim()||'—', avDni:V('av-dni').trim()||'—',
     avIng:N('av-ing'), mAval:MON.aval,
+    nosisReq: !!(G('nosis-req') && G('nosis-req').checked),
     fecha:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),
     hora:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
   };
@@ -503,6 +505,7 @@ function resumenTexto(d){
   if (d.sumaUSD>0) lineas.push('Suma asegurada USD: '+fU(d.sumaUSD)+' · Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/mes x6) · Contado: '+fU(d.contUSD)+(ELEGIDO.USD?' · ELIGIÓ: '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único'):''));
   lineas.push('Ingreso mensual: '+fM(d.ingreso,d.mI));
   if (d.avNom!=='—') lineas.push('Avalista: '+d.avNom+' (DNI '+d.avDni+') · Ingreso: '+fM(d.avIng,d.mAval));
+  if (d.nosisReq) lineas.push('Informe Nosis: SOLICITADO (gratuito)');
   if (d.obs!=='—') lineas.push('Observaciones: '+d.obs);
   return lineas.join('\n');
 }

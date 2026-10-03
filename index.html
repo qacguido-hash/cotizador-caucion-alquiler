@@ -211,13 +211,24 @@
         </div>
 
         <div class="fg upload-group show" id="grp-recibos">
-          <label>Recibos de sueldo / certificación de ingresos <span class="hint">Último año</span></label>
+          <label>Recibos de sueldo / certificación de ingresos <span class="hint">Opcional — último año</span></label>
           <label class="upload-zone" id="uz-recibos" for="doc-recibos">
             <div class="uz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg></div>
             <div class="uz-text"><strong>Elegí uno o más archivos</strong> — PDF, JPG o PNG</div>
             <input type="file" id="doc-recibos" name="doc-recibos" accept=".pdf,.jpg,.jpeg,.png" multiple>
           </label>
           <div class="upload-files" id="doc-recibos-files"></div>
+        </div>
+
+        <div class="fg nosis-card">
+          <label class="nosis-check" for="nosis-req">
+            <input type="checkbox" id="nosis-req" name="nosis-req">
+            <span class="nosis-box"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+            <span class="nosis-copy">
+              <span class="nosis-title">Pedir informe Nosis del inquilino <span class="nosis-free">Gratis</span></span>
+              <span class="nosis-desc">Acelera la aprobación. Lo consultamos con el DNI que completaste arriba, sin costo para vos.</span>
+            </span>
+          </label>
         </div>
 
         <div class="fg upload-group" id="grp-aval">

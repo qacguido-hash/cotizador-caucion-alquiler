@@ -99,6 +99,18 @@ input.invalid{border-color:var(--red);background:var(--red-pale);}
 .upload-chip button{background:var(--surface);border:none;color:var(--muted);cursor:pointer;padding:3px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .upload-chip .icon{width:10px;height:10px;}
 
+.nosis-card{border:1.5px solid var(--border);border-radius:8px;padding:13px 14px;background:#fff;}
+.nosis-check{display:flex;align-items:flex-start;gap:11px;cursor:pointer;}
+.nosis-check input{position:absolute;opacity:0;width:0;height:0;}
+.nosis-box{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all var(--dur-fast);}
+.nosis-box .icon{width:12px;height:12px;color:#fff;opacity:0;transform:scale(.5);transition:all var(--dur-fast);}
+.nosis-check input:checked ~ .nosis-box{background:var(--green);border-color:var(--green);}
+.nosis-check input:checked ~ .nosis-box .icon{opacity:1;transform:scale(1);}
+.nosis-copy{flex:1;}
+.nosis-title{display:block;font-size:12.5px;font-weight:700;color:var(--text);}
+.nosis-free{display:inline-block;margin-left:6px;background:var(--green-pale);color:var(--green);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:20px;vertical-align:middle;}
+.nosis-desc{display:block;font-size:11px;color:var(--muted);margin-top:3px;}
+
 .mfield{display:flex;border:1.5px solid var(--border);border-radius:4px;overflow:hidden;background:#fff;transition:border var(--dur-fast);}
 .mfield:focus-within{border-color:var(--wine);box-shadow:0 0 0 3px rgba(52,80,107,.1);}
 .mtog{display:flex;flex-shrink:0;border-right:1.5px solid var(--border);}
