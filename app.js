@@ -113,7 +113,7 @@ function getPct(meses){
    el alquiler está en USD pero expensas/servicios se cargaron en
    pesos (o viceversa) ── */
 var DOLAR_BNA = null;
-var DOLAR_BNA_FALLBACK = 1516; // referencia (dólar BNA venta, actualizado 08/10/2026) si no se pudo consultar — actualizar a mano si hace falta
+var DOLAR_BNA_FALLBACK = 1515.5; // referencia (BNA, cotización Divisas, venta — 08/10/2026) si no se pudo consultar — actualizar a mano si hace falta
 function tipoCambio(){ return DOLAR_BNA || DOLAR_BNA_FALLBACK; }
 function cargarDolarBNA(){
   try{
