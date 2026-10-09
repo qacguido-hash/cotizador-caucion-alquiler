@@ -39,11 +39,11 @@ Si en algún momento quieren que los documentos lleguen como adjunto real dentro
 
 ## Fórmula de cotización (para referencia futura)
 
-- **Suma asegurada** = (alquiler mensual + expensas + servicios) × duración en meses, por separado en cada moneda si hay montos en pesos y en dólares.
-- **Costo según duración:**
-  - 12 meses → 6,00% en 6 cuotas sin interés / 5,10% al contado
-  - 24 meses → 5,40% en 6 cuotas sin interés / 4,90% al contado
-  - 36 meses → 5,10% en 6 cuotas sin interés / 4,80% al contado
+- **Suma asegurada** = (alquiler mensual + expensas + servicios) × duración en meses, todo en la moneda del alquiler. Si expensas/servicios se cargan en otra moneda, se convierten al dólar BNA vendedor (con un valor de referencia si no se pudo consultar la cotización).
+- **Costo según duración** (tasas originales con -5% relativo en cuotas y -15% relativo al contado):
+  - 12 meses → 5,70% en 6 cuotas sin interés / 4,335% al contado
+  - 24 meses → 5,13% en 6 cuotas sin interés / 4,165% al contado
+  - 36 meses → 4,845% en 6 cuotas sin interés / 4,08% al contado
 - **Avalista:** se ofrece si el ingreso mensual neto es menor a 2 veces el alquiler mensual.
 
 ## Datos de contacto embebidos en el código

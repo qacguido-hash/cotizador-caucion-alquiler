@@ -52,6 +52,7 @@ function enviarEmailJS(data){
     aval_ingreso:data.avIng>0?fM(data.avIng,data.mAval):'—',
     documentos_adjuntos:totalDocs()+' archivo'+(totalDocs()===1?'':'s')+' (ver en el panel de Netlify Forms)',
     nosis_req:data.nosisReq ? 'Sí — gratuito' : 'No solicitado',
+    tipo_cambio:data.mixto ? '$'+Math.round(data.tc).toLocaleString('es-AR')+' (dólar BNA vendedor)' : '—',
     observaciones:data.obs, fecha:data.fecha, hora:data.hora
   }).then(function(){
     console.log('EmailJS: notificación enviada.');
@@ -101,27 +102,60 @@ function setM(campo, m){
   recalc(); saveDraft();
 }
 
-/* ── porcentajes según duración (misma fórmula que el sitio original) ── */
+/* ── porcentajes según duración (contado -15%, cuotas -5% sobre las tasas originales) ── */
 function getPct(meses){
-  if (meses===24) return { cuotas:.054, contado:.049 };
-  if (meses===36) return { cuotas:.051, contado:.048 };
-  return { cuotas:.060, contado:.051 };
+  if (meses===24) return { cuotas:.0513, contado:.04165 };
+  if (meses===36) return { cuotas:.04845, contado:.0408 };
+  return { cuotas:.0570, contado:.04335 };
+}
+
+/* ── dólar BNA (vendedor), para unificar en una sola moneda cuando
+   el alquiler está en USD pero expensas/servicios se cargaron en
+   pesos (o viceversa) ── */
+var DOLAR_BNA = null;
+var DOLAR_BNA_FALLBACK = 1516; // referencia (dólar BNA venta, actualizado 08/10/2026) si no se pudo consultar — actualizar a mano si hace falta
+function tipoCambio(){ return DOLAR_BNA || DOLAR_BNA_FALLBACK; }
+function cargarDolarBNA(){
+  try{
+    var cached = JSON.parse(localStorage.getItem('dolarBNA')||'null');
+    var hoy = new Date().toISOString().slice(0,10);
+    if (cached && cached.fecha===hoy && cached.valor>0) DOLAR_BNA = cached.valor;
+  }catch(e){}
+  fetch('https://dolarapi.com/v1/dolares/oficial').then(function(r){ return r.json(); }).then(function(j){
+    if (j && j.venta>0){
+      DOLAR_BNA = j.venta;
+      try{ localStorage.setItem('dolarBNA', JSON.stringify({valor:DOLAR_BNA, fecha:new Date().toISOString().slice(0,10)})); }catch(e){}
+      recalc();
+    }
+  }).catch(function(e){ console.error('No se pudo obtener el dólar BNA, se usa un valor de referencia:', e); });
+}
+cargarDolarBNA();
+
+function convertir(valor, monedaOrigen, monedaDestino){
+  if (valor<=0 || monedaOrigen===monedaDestino) return valor;
+  var tc = tipoCambio();
+  return monedaOrigen==='USD' ? valor*tc : valor/tc;
 }
 
 function calcData(){
   var canonV=N('canon'), expV=N('expensas'), serV=N('servicios');
   var meses=parseInt(V('duracion'))||0;
   var pct=getPct(meses);
-  var mensARS=(MON.canon==='ARS'?canonV:0)+(MON.exp==='ARS'?expV:0)+(MON.ser==='ARS'?serV:0);
-  var mensUSD=(MON.canon==='USD'?canonV:0)+(MON.exp==='USD'?expV:0)+(MON.ser==='USD'?serV:0);
-  var sumaARS=mensARS*meses, sumaUSD=mensUSD*meses;
+  var monedaFinal = MON.canon;
+  var expConv = convertir(expV, MON.exp, monedaFinal);
+  var serConv = convertir(serV, MON.ser, monedaFinal);
+  var mensFinal = canonV + expConv + serConv;
+  var sumaARS = monedaFinal==='ARS' ? mensFinal*meses : 0;
+  var sumaUSD = monedaFinal==='USD' ? mensFinal*meses : 0;
   var costoARS=sumaARS*pct.cuotas, cuotaARS=costoARS/6, contARS=sumaARS*pct.contado;
   var costoUSD=sumaUSD*pct.cuotas, cuotaUSD=costoUSD/6, contUSD=sumaUSD*pct.contado;
+  var convirtio = (expV>0 && MON.exp!==monedaFinal) || (serV>0 && MON.ser!==monedaFinal);
   return { canonV:canonV, expV:expV, serV:serV, meses:meses,
     sumaARS:sumaARS, sumaUSD:sumaUSD,
     costoARS:costoARS, cuotaARS:cuotaARS, contARS:contARS,
     costoUSD:costoUSD, cuotaUSD:cuotaUSD, contUSD:contUSD,
-    hayARS:mensARS>0, hayUSD:mensUSD>0, mixto:mensARS>0 && mensUSD>0 };
+    hayARS:sumaARS>0, hayUSD:sumaUSD>0, mixto:convirtio,
+    monedaFinal:monedaFinal, tc:tipoCambio() };
 }
 
 /* ── animación de números ─────────────────────────── */
@@ -150,6 +184,9 @@ function ahorroHTML(costoCuotas, costoContado){
 function recalc(){
   var d = calcData();
   G('mixed-note').classList.toggle('show', d.mixto);
+  if (d.mixto){
+    G('mixed-note-txt').innerHTML = 'Expensas y/o servicios convertidos a <strong>'+(d.monedaFinal==='USD'?'dólares':'pesos')+'</strong> al dólar BNA vendedor ($'+Math.round(d.tc).toLocaleString('es-AR')+') para cotizar todo junto.';
+  }
   G('v-canon').textContent = fM(d.canonV, MON.canon);
   G('v-exp').textContent = d.expV>0 ? fM(d.expV, MON.exp) : '—';
   G('v-ser').textContent = d.serV>0 ? fM(d.serV, MON.ser) : '—';
@@ -331,6 +368,7 @@ function construirDatos(){
     avNom:V('av-nom').trim()||'—', avDni:V('av-dni').trim()||'—',
     avIng:N('av-ing'), mAval:MON.aval,
     nosisReq: !!(G('nosis-req') && G('nosis-req').checked),
+    mixto:d.mixto, tc:d.tc,
     fecha:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),
     hora:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
   };
@@ -444,7 +482,9 @@ function hacerPDF(d){
   row('Canon mensual',fM(d.canonV,d.mC),false);
   row('Expensas',d.expV>0?fM(d.expV,d.mE):'—',true);
   row('Servicios',d.serV>0?fM(d.serV,d.mS):'—',false);
-  row('Duración contrato',d.meses+' meses',true); y+=4;
+  row('Duración contrato',d.meses+' meses',true);
+  if (d.mixto) row('Tipo de cambio aplicado',' $'+Math.round(d.tc).toLocaleString('es-AR')+' (dólar BNA vendedor)',false);
+  y+=4;
 
   if (d.sumaARS > 0) {
     checkPage(17+38);
@@ -503,6 +543,7 @@ function resumenTexto(d){
   ];
   if (d.sumaARS>0) lineas.push('Suma asegurada ARS: '+fA(d.sumaARS)+' · Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/mes x6) · Contado: '+fA(d.contARS)+(ELEGIDO.ARS?' · ELIGIÓ: '+(ELEGIDO.ARS==='cuotas'?'6 cuotas':'pago único'):''));
   if (d.sumaUSD>0) lineas.push('Suma asegurada USD: '+fU(d.sumaUSD)+' · Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/mes x6) · Contado: '+fU(d.contUSD)+(ELEGIDO.USD?' · ELIGIÓ: '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único'):''));
+  if (d.mixto) lineas.push('Tipo de cambio aplicado (dólar BNA vendedor): $'+Math.round(d.tc).toLocaleString('es-AR'));
   lineas.push('Ingreso mensual: '+fM(d.ingreso,d.mI));
   if (d.avNom!=='—') lineas.push('Avalista: '+d.avNom+' (DNI '+d.avDni+') · Ingreso: '+fM(d.avIng,d.mAval));
   if (d.nosisReq) lineas.push('Informe Nosis: SOLICITADO (gratuito)');
