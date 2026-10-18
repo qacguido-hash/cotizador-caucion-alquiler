@@ -43,8 +43,9 @@
 .wrap.wide .sidebar{display:none;}
 
 /* layout de dos columnas: datos del riesgo | coberturas */
-.riesgo-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:32px;align-items:start;}
+.riesgo-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:32px;align-items:stretch;}
 .riesgo-col{min-width:0;}
+.riesgo-col:first-child{display:flex;flex-direction:column;justify-content:space-between;}
 .riesgo-col .fg{margin-bottom:0;min-width:0;}
 .riesgo-col .fg + .fg{margin-top:14px;}
 .riesgo-col .fg input,.riesgo-col .fg select{min-width:0;}
