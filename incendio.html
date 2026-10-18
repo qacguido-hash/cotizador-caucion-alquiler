@@ -120,7 +120,7 @@
 </div>
 
 <div class="wrap wide" id="wrap-main">
-  <form name="cotizacion-incendio" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form-incendio">
+  <form name="cotizacion-incendio" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" id="form-incendio">
   <input type="hidden" name="form-name" value="cotizacion-incendio">
   <div class="fg hp" aria-hidden="true" style="position:absolute;left:-9999px">
     <label for="bot-field-incendio">No completar este campo</label>
@@ -131,7 +131,7 @@
   <input type="hidden" name="resumen_cotizacion" id="hid-resumen">
   <div class="fc">
     <div class="fh">
-      <div class="fh-ic ember"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c2 3-2 4-2 7a4 4 0 008 0c0-2-1-3-2-4 1 3-1 4-2 4-1.5 0-2-1.5-1-3-2 1-3 3-3 6a6 6 0 1012 0c0-5-4-7-6-10-1 2-2 3-4 0z"/></svg></div>
+      <div class="fh-ic ember"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg></div>
       <div><h3>Formulario de Cotización</h3><p>Completá los datos · Respuesta en 24 hs hábiles</p></div>
     </div>
     <div class="steps">
@@ -424,6 +424,7 @@ var PCT_IMPUESTOS = 0.028292;
 
 var formaPago = 'cuotas';
 var ULTIMO_TOTAL = 0;
+var ULTIMO_DATOS = null;
 
 function recalc(){
   var saEdif = N('sa-edificio'), saCont = N('sa-contenido'), saRc = N('sa-rc');
@@ -478,32 +479,90 @@ function recalc(){
   el.addEventListener('change', recalc);
 });
 
+/* ── arma el objeto de datos completo, en el orden pedido:
+   datos del tomador primero, después sumas aseguradas por concepto,
+   y al final prima total / premio total ── */
+function construirDatosIncendio(){
+  var saEdif = N('sa-edificio'), saCont = N('sa-contenido'), saRc = N('sa-rc');
+  var saCat = saEdif+saCont;
+  var chkTerr = G('chk-terremoto').checked, chkGran = G('chk-granizo').checked;
+  var primaEdif = saEdif>0 ? saEdif*TASA_EDIFICIO : 0;
+  var primaCont = saCont>0 ? saCont*TASA_CONTENIDO : 0;
+  var primaRc = saRc>0 ? saRc*TASA_RC : 0;
+  var primaTerr = chkTerr ? saCat*TASA_TERREMOTO : 0;
+  var primaGran = chkGran ? saCat*TASA_GRANIZO : 0;
+  var saRemocion = saEdif>0 ? saEdif*PCT_REMOCION : 0;
+  var primaTotal = primaEdif+primaCont+primaRc+primaTerr+primaGran;
+  var recargo = formaPago==='cuotas' ? primaTotal*PCT_RECARGO_CUOTAS : 0;
+  var iva = (primaTotal+recargo)*PCT_IVA;
+  var impuestos = primaTotal*PCT_IMPUESTOS;
+  var premioTotal = primaTotal+recargo+iva+impuestos;
+  var ahora = new Date();
+  return {
+    nombre:V('nombre').trim(), apellido:V('apellido').trim(),
+    email:V('email').trim(), tel:V('tel').trim(),
+    provincia:V('provincia')||'—', localidad:V('localidad').trim()||'—',
+    dir:V('dir').trim()||'—', superficie:V('superficie')||'—',
+    actividad:V('actividad').trim()||'—',
+    saEdif:saEdif, primaEdif:primaEdif,
+    saCont:saCont, primaCont:primaCont,
+    chkTerr:chkTerr, saCat:saCat, primaTerr:primaTerr,
+    chkGran:chkGran, primaGran:primaGran,
+    saRc:saRc, primaRc:primaRc,
+    saRemocion:saRemocion,
+    primaTotal:primaTotal, recargo:recargo, iva:iva, impuestos:impuestos, premioTotal:premioTotal,
+    cuotaMensual:premioTotal/10,
+    fecha:ahora.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    hora:ahora.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})
+  };
+}
+
 function buildResumen(){
   recalc();
+  var d = construirDatosIncendio();
   var cob = [];
-  if (N('sa-edificio')>0) cob.push('Incendio Edificio: '+fAraw(N('sa-edificio'))+' (prima '+G('pr-edificio').textContent+')');
-  if (N('sa-contenido')>0) cob.push('Incendio Contenido: '+fAraw(N('sa-contenido'))+' (prima '+G('pr-contenido').textContent+')');
-  if (N('sa-rc')>0) cob.push('RC Linderos: '+fAraw(N('sa-rc'))+' (prima '+G('pr-rc').textContent+')');
-  if (G('chk-terremoto').checked) cob.push('Terremoto (prima '+G('pr-terremoto').textContent+')');
-  if (G('chk-granizo').checked) cob.push('Granizo (prima '+G('pr-granizo').textContent+')');
-  var html='<strong>Solicitante:</strong> '+((V('nombre')+' '+V('apellido')).trim()||'—')+'<br>'
-    +'<strong>Inmueble:</strong> '+(V('actividad')||'—')+' · '+(V('localidad')||'—')+', '+(V('provincia')||'—')+'<br>'
-    +'<strong>Superficie:</strong> '+(V('superficie')?V('superficie')+' m²':'—')+'<br>'
-    +'<strong>Coberturas:</strong> '+(cob.length?cob.join(' · '):'—')+'<br>'
+  if (d.saEdif>0) cob.push('Incendio Edificio: '+fAraw(d.saEdif)+' (prima '+fA(d.primaEdif)+')');
+  if (d.saCont>0) cob.push('Incendio Contenido: '+fAraw(d.saCont)+' (prima '+fA(d.primaCont)+')');
+  if (d.chkTerr) cob.push('Terremoto (prima '+fA(d.primaTerr)+')');
+  if (d.chkGran) cob.push('Granizo (prima '+fA(d.primaGran)+')');
+  if (d.saRc>0) cob.push('RC Linderos: '+fAraw(d.saRc)+' (prima '+fA(d.primaRc)+')');
+  if (d.saRemocion>0) cob.push('Remoción de Escombros: '+fAraw(d.saRemocion)+' (incluida)');
+
+  var html='<strong>Nombre completo:</strong> '+((d.nombre+' '+d.apellido).trim()||'—')+'<br>'
+    +'<strong>Email:</strong> '+(d.email||'—')+' · <strong>Teléfono:</strong> '+(d.tel||'—')+'<br>'
+    +'<strong>Provincia:</strong> '+d.provincia+' · <strong>Localidad:</strong> '+d.localidad+'<br>'
+    +'<strong>Dirección:</strong> '+d.dir+'<br>'
+    +'<strong>Superficie:</strong> '+(d.superficie!=='—'?d.superficie+' m²':'—')+'<br>'
+    +'<strong>Uso del inmueble:</strong> '+d.actividad+'<br>'
+    +'<strong>Sumas aseguradas:</strong><br>'+(cob.length?cob.join('<br>'):'—')+'<br>'
     +'<strong>Forma de pago:</strong> 10 cuotas (cobranza convenio)<br>'
-    +'<strong>Premio total:</strong> <span style="color:#C85A30;font-weight:700">'+G('v-total').textContent+'</span>';
+    +'<strong>Prima total:</strong> '+fA(d.primaTotal)+'<br>'
+    +'<strong>Premio total:</strong> <span style="color:#C85A30;font-weight:700">'+fA(d.premioTotal)+'</span>';
   G('rdata').innerHTML = html;
 
-  var resumenTexto = 'Solicitante: '+((V('nombre')+' '+V('apellido')).trim()||'—')
-    +' | Inmueble: '+(V('actividad')||'—')+' · '+(V('localidad')||'—')+', '+(V('provincia')||'—')
-    +' | Superficie: '+(V('superficie')?V('superficie')+' m²':'—')
-    +' | Coberturas: '+(cob.length?cob.join(' · '):'—')
-    +' | Forma de pago: 10 cuotas (cobranza convenio)'
-    +' | Premio total estimado: '+G('v-total').textContent
-    +' | Tasas de referencia, a confirmar con la aseguradora.';
+  var resumenTexto = [
+    'DATOS DEL TOMADOR',
+    'Nombre completo: '+((d.nombre+' '+d.apellido).trim()||'—'),
+    'Email: '+(d.email||'—')+' | Teléfono: '+(d.tel||'—'),
+    'Provincia: '+d.provincia,
+    'Localidad: '+d.localidad,
+    'Dirección: '+d.dir,
+    'Metros cuadrados cubiertos: '+(d.superficie!=='—'?d.superficie+' m²':'—'),
+    'Uso del inmueble: '+d.actividad,
+    '',
+    'SUMAS ASEGURADAS',
+  ].concat(cob.length?cob:['—']).concat([
+    '',
+    'Forma de pago: 10 cuotas (cobranza convenio)',
+    'Prima total: '+fA(d.primaTotal),
+    'Premio total: '+fA(d.premioTotal),
+    'Tasas de referencia, a confirmar con la aseguradora.'
+  ]).join('\n');
+
   G('hid-resumen').value = resumenTexto;
-  G('hid-premio-total').value = G('v-total').textContent;
-  G('hid-cuota').value = fA(ULTIMO_TOTAL/10);
+  G('hid-premio-total').value = fA(d.premioTotal);
+  G('hid-cuota').value = fA(d.cuotaMensual);
+  ULTIMO_DATOS = d;
 }
 
 document.querySelectorAll('[data-go]').forEach(function(btn){
@@ -546,10 +605,14 @@ function enviar(){
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Enviando...';
 
+  var pdf = hacerPDFIncendio(ULTIMO_DATOS);
+
   var formEl = G('form-incendio');
   var fd = new FormData(formEl);
+  fd.append('cotizacion_pdf', pdf.blob, pdf.filename);
 
   function mostrarExito(){
+    pdf.doc.save(pdf.filename);
     G('p3btns').style.display='none';
     G('fail').classList.remove('show');
     G('succ').classList.add('show');
@@ -558,6 +621,7 @@ function enviar(){
     toast('Cotización enviada correctamente');
   }
   function mostrarFallo(){
+    pdf.doc.save(pdf.filename);
     G('fail').classList.add('show');
     btn.disabled=false;
     btn.innerHTML='Reintentar <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>';
@@ -594,5 +658,8 @@ G('btn-reset').addEventListener('click', function(){
   go(1);
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="pdf-assets.js"></script>
+<script src="incendio-pdf.js"></script>
 </body>
 </html>
