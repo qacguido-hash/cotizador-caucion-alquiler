@@ -51,8 +51,9 @@
 
 /* tabla de coberturas — fila en línea: nombre | suma asegurada | prima */
 .cov{margin-bottom:4px;}
-.cov-head{display:grid;grid-template-columns:1.6fr 1fr .8fr;gap:10px;padding:0 16px;margin-bottom:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--wine);}
-.cov-head span:first-child{visibility:hidden;}
+.cov-head{display:grid;grid-template-columns:1.6fr 1fr .8fr;gap:10px;padding:0 16px;margin-bottom:8px;align-items:end;}
+.cov-head span{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--wine);text-align:right;}
+.cov-head span.cov-section-label{margin:0;text-align:left;}
 .cov-group{margin-bottom:10px;}
 .cov-group:last-of-type{margin-bottom:14px;}
 .cov-row{display:grid;grid-template-columns:1.6fr 1fr .8fr;gap:10px;align-items:center;min-height:52px;padding:10px 16px;border-left:3px solid #C85A30;background:var(--surface);border-radius:0 6px 6px 0;margin-bottom:8px;min-width:0;}
@@ -70,7 +71,7 @@
 .cov-prima.muted{color:var(--muted);font-weight:600;}
 .cov-foot{font-size:10.5px;color:var(--muted);padding:0 16px;line-height:1.6;}
 .cov-foot .req{margin-right:3px;}
-.cov-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--wine);margin:18px 0 8px;}
+.cov-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--wine);margin:18px 0 8px;text-align:left;}
 .cov-section-label:first-child{margin-top:0;}
 .total-inline{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:14px;text-align:center;}
 .total-inline .ti-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px;}
@@ -184,9 +185,8 @@
           </div>
 
           <div class="riesgo-col">
-            <div class="cov-section-label">Coberturas</div>
             <div class="cov">
-              <div class="cov-head"><span>Cobertura</span><span style="text-align:right">Suma asegurada</span><span style="text-align:right">Prima</span></div>
+              <div class="cov-head"><span class="cov-section-label">Coberturas</span><span>Suma asegurada</span><span>Prima</span></div>
 
               <div class="cov-group">
                 <div class="cov-row">
