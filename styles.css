@@ -5,7 +5,7 @@
   --whatsapp:#25d366;--whatsapp-deep:#128c7e;
   --green:#1a7a3c;--green-pale:#EAF6EE;--red:#b0303a;--red-pale:#FBEAEC;
   --radius:10px;--shadow:0 10px 30px rgba(40,55,70,.12);
-  --font:'Saira',sans-serif;--font-cond:'Saira Condensed',sans-serif;
+  --font:'Inter',sans-serif;--font-cond:'Inter',sans-serif;
   --dur-fast:.18s;--dur-med:.35s;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
