@@ -53,7 +53,7 @@
 .riesgo-col .fg input,.riesgo-col .fg select{min-width:0;}
 
 /* tabla de coberturas — fila en línea: nombre | suma asegurada | prima */
-.cov{margin-bottom:4px;}
+.cov{margin-bottom:0;}
 .cov-head{display:grid;grid-template-columns:1.6fr 1fr .8fr;gap:10px;padding:0 16px;margin-bottom:8px;align-items:end;}
 .cov-head span{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--wine);text-align:right;}
 .cov-head span.cov-section-label{margin:0;text-align:left;}
@@ -242,8 +242,13 @@
           </div>
         </div>
 
-        <div class="cov-foot"><span class="req ember">*</span> Campos obligatorios. Terremoto y Granizo son opcionales con costo adicional.</div>
-        <p class="ilustrativo">* Valores calculados con tasas de referencia — a confirmar con la aseguradora al emitir la póliza.</p>
+        <div class="riesgo-grid" style="margin-top:0;">
+          <div></div>
+          <div>
+            <div class="cov-foot"><span class="req ember">*</span> Campos obligatorios. Terremoto y Granizo son opcionales con costo adicional.</div>
+            <p class="ilustrativo">* Valores calculados con tasas de referencia — a confirmar con la aseguradora al emitir la póliza.</p>
+          </div>
+        </div>
 
         <div class="bnav">
           <button class="btn btn-ember" type="button" style="flex:1" data-go="2">Continuar →</button>
