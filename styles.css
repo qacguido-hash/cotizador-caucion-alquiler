@@ -27,6 +27,10 @@ button{font:inherit;}
 .monogram-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:220px;width:auto;opacity:.05;pointer-events:none;z-index:0;}
 .hero-card h1{font-size:clamp(22px,3.6vw,29px);text-transform:uppercase;font-weight:400;color:var(--mauve);letter-spacing:.4px;margin-bottom:10px;position:relative;z-index:1;}
 .hero-card h1 em{color:var(--wine);font-style:normal;font-weight:600;}
+.xsell-incendio{display:inline-flex;align-items:center;gap:5px;margin-top:30px;font-family:var(--font);font-size:12.5px;color:var(--mauve);position:relative;z-index:1;text-decoration:none;}
+.xsell-incendio strong{color:#C85A30;font-weight:700;}
+.xsell-incendio svg{width:10px;height:10px;flex-shrink:0;}
+.xsell-incendio:hover strong{text-decoration:underline;}
 
 .benefits{background:var(--surface);border-bottom:1px solid var(--border);}
 .ben-inner{max-width:940px;margin:0 auto;padding:16px 20px 18px;}

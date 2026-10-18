@@ -381,8 +381,8 @@ function buildResumen(){
   var html='<strong>Solicitante:</strong> '+(nom||'—')+'<br>'
     +'<strong>Inmueble:</strong> '+(V('tipo')||'—')+' · '+(V('dir')||'—')+'<br>'
     +'<strong>Duración:</strong> '+(d.meses||'—')+' meses<br>';
-  if (d.hayARS) html+='<strong>Suma ARS:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fA(d.sumaARS)+'</span> → Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/c) | Contado: '+fA(d.contARS)+(ELEGIDO.ARS?' · <strong>Elegido: '+(ELEGIDO.ARS==='cuotas'?'6 cuotas':'pago único')+'</strong>':'')+'<br>';
-  if (d.hayUSD) html+='<strong>Suma USD:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fU(d.sumaUSD)+'</span> → Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/c) | Contado: '+fU(d.contUSD)+(ELEGIDO.USD?' · <strong>Elegido: '+(ELEGIDO.USD==='cuotas'?'6 cuotas':'pago único')+'</strong>':'')+'<br>';
+  if (d.hayARS) html+='<strong>Suma ARS:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fA(d.sumaARS)+'</span> → '+(ELEGIDO.ARS==='cuotas'?'6 cuotas de '+fA(d.cuotaARS)+' (total '+fA(d.costoARS)+')':ELEGIDO.ARS==='contado'?'Pago único de '+fA(d.contARS):'Cuotas: '+fA(d.costoARS)+' ('+fA(d.cuotaARS)+'/c) | Contado: '+fA(d.contARS))+'<br>';
+  if (d.hayUSD) html+='<strong>Suma USD:</strong> <span style="color:var(--yellow-deep);font-weight:700">'+fU(d.sumaUSD)+'</span> → '+(ELEGIDO.USD==='cuotas'?'6 cuotas de '+fU(d.cuotaUSD)+' (total '+fU(d.costoUSD)+')':ELEGIDO.USD==='contado'?'Pago único de '+fU(d.contUSD):'Cuotas: '+fU(d.costoUSD)+' ('+fU(d.cuotaUSD)+'/c) | Contado: '+fU(d.contUSD))+'<br>';
   var nd=totalDocs();
   html += '<strong>Documentos adjuntos:</strong> '+(nd>0 ? nd+' archivo'+(nd===1?'':'s') : 'ninguno todavía');
   G('rdata').innerHTML=html;
@@ -582,7 +582,6 @@ function enviar(){
     G('fail').classList.remove('show');
     G('succ').classList.add('show');
     G('rbox').style.display='none';
-    G('snote').style.display='none';
     for (var i=1;i<=4;i++){ G('st'+i).classList.remove('on'); G('st'+i).classList.add('done'); }
     toast('Cotización enviada correctamente');
     clearDraft();
@@ -644,7 +643,6 @@ function resetForm(){
   G('p4btns').style.display='flex';
   G('p4wa').style.display='none';
   G('rbox').style.display='block';
-  G('snote').style.display='block';
   G('aval-box').classList.remove('show');
   var st=G('ing-st');
   st.innerHTML='<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg><span>Ingresá tu ingreso mensual neto para verificar.</span>';
